@@ -1,13 +1,9 @@
 "use client";
 import { exampleQuery, primaryColors, secondaryColors } from "@/constants";
 import Image from "next/image";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import Avatar from "@mui/material/Avatar";
-import { green, pink, deepOrange } from "@mui/material/colors";
-import Box from "@mui/material/Box";
-import Input from "@mui/material/Input";
-const ariaLabel = { "aria-label": "description" };
+
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
@@ -23,7 +19,54 @@ const TailwindGen = () => {
     secondaryColor: "White",
   });
 
-  const handleGenerateCode = () => {
+  // const handleGenerateCode = () => {
+  //   setIsLoading(true);
+
+  //   fetch("/api/genTailwindCode", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({
+  //       context,
+  //       query: input,
+  //       theme: theme,
+  //     }),
+  //   })
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       if (data.success) {
+  //         setDisp(data.data);
+
+  //         setContext([
+  //           ...context,
+  //           {
+  //             type: "user",
+  //             message: input,
+  //           },
+  //           {
+  //             type: "assistant",
+  //             message: data.data,
+  //           },
+  //         ]);
+
+  //         // console.log(data.code, "data");
+
+  //         console.log(context, "context");
+  //         setIsLoading(false);
+  //       } else {
+  //         // setOutput(data.error);
+  //       }
+  //       setIsLoading(false);
+  //       // hljs.highlightAll();
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error:", error);
+  //       setIsLoading(false);
+  //     });
+  // };
+
+  const handleAddGenerateCode = () => {
     setIsLoading(true);
 
     fetch("/api/genTailwindCode", {
@@ -62,7 +105,6 @@ const TailwindGen = () => {
           // setOutput(data.error);
         }
         setIsLoading(false);
-        // hljs.highlightAll();
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -161,26 +203,30 @@ const TailwindGen = () => {
       });
   };
 
-  return (
-    <div className="relative gap-5">
-      <DynamicJS href="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp" />
+  const containerRef = useRef(null);
 
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.lastChild.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [disp, context]);
+
+  return (
+    <div className="relative px-10">
       <div
-        className="mx-auto w-3/5 h-full p-4"
+        className="mx-auto  h-full p-4 pt-14"
         style={{ backgroundColor: "#f2f0e8" }}
       >
         <div
-          className={`flex flex-col justify-center items-center ${
-            context.length === 0 ? "h-[250px]" : "h-[125px]"
-          }`}
+          className={`flex flex-col justify-center items-center `}
           style={{ backgroundColor: "#f2f0e8" }}
         >
-          <h1 className="text-4xl text-center font-serif">
+          <h1 className="font-bold pt-6 text-2xl md:text-4xl text-center ">
             {" "}
-            Generate Tailwind Components using GPT
+            Generate Tailwind Components using AI
           </h1>{" "}
           {context.length === 0 && (
-            <p className="p-3 w-4/5 font-serif">
+            <p className="hidden md:block p-3 max-w-3xl  text-center">
               Explain the component you want to create. Using LLMs, we generate
               and render the component. Iterate to create your perfect component
               and export the code in your favorite frameworks.
@@ -188,46 +234,41 @@ const TailwindGen = () => {
           )}
         </div>
 
-        {context.map((item, key) => (
+        {context.map((item, index) => (
           <div
-            className="flex flex-col gap-1 bg-gray-300 mb-1 border-solid border-black rounded"
+            className={`max-w-2xl mx-auto flex flex-col mb-2 bg-gray-200 border-solid border-black rounded ${
+              index === 0 ? "mt-6" : ""
+            }`}
             style={{ backgroundColor: "#f2f0e8" }}
-            id={`item_${key}`}
-            key={key}
+            key={`${item.type}-${index}`}
           >
             {item.type === "user" && (
               <div className="flex flex-row">
                 <div className="flex-grow"></div>
                 <div
-                  className="flex justify-end items-center rounded-lg py-3 px-2 mb-1 shadow-md border border-solid"
+                  className="flex justify-end items-center rounded-md py-1 px-2 mb-1 shadow-md border border-solid"
                   style={{ backgroundColor: "#e8e5d7", margin: 0 }}
                 >
-                  <h1 className=" text-black px-5 font-serif">
-                    {" "}
-                    {item.message}{" "}
-                  </h1>
-                  <Avatar
-                    sx={{ bgcolor: deepOrange[500], width: 30, height: 30 }}
-                    src="broken-image.jpg"
-                  />
+                  <h1 className=" text-black px-1 "> {item.message} </h1>
                 </div>
               </div>
             )}
 
             {item.type === "assistant" && (
               <div
-                className="rounded-lg w-full mb-2 mx-auto shadow-md border-solid border"
+                className="rounded-md w-full mb-2 mx-auto shadow-md border-solid border"
                 style={{ backgroundColor: "#f7f7f3" }}
+                ref={containerRef}
               >
                 <div
-                  className="flex justify-start mt-4 mx-20 gap-1"
+                  className="m-4"
                   dangerouslySetInnerHTML={{ __html: item.message }}
                 />
                 <div className="flex justify-between items-end  rounded gap-1 pt-7 px-2 py-2">
                   <div className="flex-grow"></div>
 
                   <div
-                    className="inline-flex items-center bg-gray-300 text-sm px-2 py-1 rounded-full cursor-pointer"
+                    className="text-xs inline-flex items-center bg-gray-200 px-2 py-1 rounded-full cursor-pointer"
                     onClick={() => handleCopyHTML(item.message)}
                   >
                     <svg
@@ -241,7 +282,7 @@ const TailwindGen = () => {
                     HTML
                   </div>
                   <div
-                    className="inline-flex items-center bg-gray-300 text-sm px-2 py-1 rounded-full cursor-pointer"
+                    className="inline-flex items-center bg-gray-200 text-xs px-2 py-1 rounded-full cursor-pointer"
                     onClick={() => handleCopyCode(item.message, "React")}
                   >
                     <svg
@@ -255,7 +296,7 @@ const TailwindGen = () => {
                     React
                   </div>
                   <div
-                    className="inline-flex items-center bg-gray-300 text-sm px-2 py-1 rounded-full cursor-pointer"
+                    className="inline-flex items-center bg-gray-200 text-xs px-2 py-1 rounded-full cursor-pointer"
                     onClick={() => handleCopyCode(item.message, "Angular")}
                   >
                     <svg
@@ -269,7 +310,7 @@ const TailwindGen = () => {
                     Angular
                   </div>
                   <div
-                    className="inline-flex items-center bg-gray-300 text-sm px-2 py-1 rounded-full cursor-pointer"
+                    className="inline-flex items-center bg-gray-200 text-xs px-2 py-1 rounded-full cursor-pointer"
                     onClick={() => handleCopyCode(item.message, "VueJs")}
                   >
                     <svg
@@ -299,44 +340,35 @@ const TailwindGen = () => {
       <div
         className={`${
           context.length !== 0 ? "fixed bottom-0 left-0 right-0" : ""
-        }  mx-auto w-3/5 flex flex-col justify-between p-3 bg-white border-solid border-2 border-yellow rounded-2xl`}
+        }  mx-auto max-w-2xl flex flex-col justify-between p-3 bg-white border-solid border-2 border-yellow rounded-2xl`}
       >
-        <div className="flex flex-row px-3">
+        <div className="flex items-center flex-col md:flex-row px-3">
           <div className="p-3 w-full border-hidden ">
-            <Box
-              component="form"
-              sx={{
-                "& > :not(style)": { m: 1 },
-                outline: "none",
+            <input
+              id="margin-none"
+              className="px-0 pb-2 remove-focus-custom border-b focus:border-b-2 border-t-0 border-l-0 border-r-0 border-slate-900 w-full outline-none focus:outline-none ring-none focus:ring-0"
+              value={input}
+              placeholder="Describe your UI to generate component"
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleAddGenerateCode();
+                }
               }}
-              noValidate
-              autoComplete="off"
-              className="border-hidden"
-            >
-              <Input
-                inputProps={ariaLabel}
-                id="margin-none"
-                className="border-hidden w-full"
-                value={input}
-                placeholder="Describe your UI to get code"
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleGenerateCode();
-                  }
-                }}
-              />
-            </Box>
+            />
           </div>
           {true && (
-            <div className="flex items-center  w-1/5">
+            <div className="">
               <button
                 type="submit"
-                className="py-1 rounded-2xl bg-orange-500 border border-solid text-white text-sm "
-                onClick={handleGenerateCode}
+                className="py-1 px-4 bg-myorange rounded-2xl border-transparent border hover:border-grey border-solid text-white text-sm "
+                onClick={handleAddGenerateCode}
               >
-                Generate Component
+                <span className="mr-2"> Generate</span>
+                <span>
+                  <i className="ri-send-plane-2-fill"></i>
+                </span>
               </button>
               <Backdrop
                 sx={{
@@ -344,7 +376,7 @@ const TailwindGen = () => {
                   zIndex: (theme) => theme.zIndex.drawer + 1,
                 }}
                 open={isLoading}
-                onClick={handleGenerateCode}
+                onClick={handleAddGenerateCode}
               >
                 <CircularProgress color="inherit" />
               </Backdrop>
@@ -352,10 +384,10 @@ const TailwindGen = () => {
           )}
         </div>
         {input !== "" && (
-          <div className="flex flex-row gap-2 p-1 mx-5">
-            <div className="flex flex-col">
+          <div className="flex flex-row gap-2 px-1 py-.5 mx-5">
+            <div className="">
               <select
-                className="border border-gray-300 rounded shadow-sm text-sm p-1"
+                className="border border-gray-300 rounded shadow-sm text-xs py-1 pl-2 pr-4"
                 value={theme.primaryColor}
                 onChange={(e) =>
                   setTheme({
@@ -369,9 +401,10 @@ const TailwindGen = () => {
                 ))}
               </select>
             </div>
-            <div className="flex flex-col">
+
+            <div className="">
               <select
-                className="border border-gray-300 rounded shadow-sm text-sm p-1"
+                className="border border-gray-300 rounded shadow-sm text-xs p-1 pl-2 pr-3"
                 value={theme.secondaryColor}
                 onChange={(e) =>
                   setTheme({
@@ -389,30 +422,25 @@ const TailwindGen = () => {
         )}
       </div>
       {input === "" && context.length === 0 && (
-        <div
-          className="flex flex-col items-center justify-center mb-10 mt-8 p-5 mx-auto w-3/5 rounded-2xl border broder-solid border-black"
-          style={{ backgroundColor: "#f2f0e8" }}
-        >
-          <h1 className="text-xl font-serif py-3">
-            {" "}
-            Understand and Work with Something{" "}
-          </h1>
-          <div className="flex flex-row items-center justify-center gap-2 ">
+        <div className="hidden max-w-2xl mx-auto md:flex flex-col items-center mb-10 mt-8 p-5 rounded-2xl border broder-solid border-myorange">
+          <h2 className="text-xl font-bold py-3">
+            What you can do with Tailwind AI
+          </h2>
+          <div className="flex flex-row items-center justify-between gap-2 ">
             <div
               className="flex flex-col items-center rounded px-1 py-2"
               style={{ backgroundColor: "#f2f0e8" }}
             >
-              <div className="w-full">
+              <div className="w-full shrink-0 grow-1 flex justify-center">
                 <Image
-                  src="https://placehold.co/600x400/png"
+                  src="/two.jpeg"
                   alt="image"
-                  layout="responsive"
+                  style={{ objectFit: "contain" }}
                   width={180}
                   height={120}
-                  className="transition-transform duration-300 ease-in-out hover:scale-110"
                 />
               </div>
-              <label className="text-center text-sm w-full mt-2 font-serif">
+              <label className="text-center text-sm w-full mt-2 ">
                 Generate components by describing in plain text
               </label>
             </div>
@@ -421,17 +449,16 @@ const TailwindGen = () => {
               className="flex flex-col items-center rounded px-1 py-2"
               style={{ backgroundColor: "#f2f0e8" }}
             >
-              <div className="w-full">
+              <div className="w-full shrink-0 grow-1 flex justify-center">
                 <Image
-                  src="https://placehold.co/600x400/png"
+                  src="/one.jpeg"
+                  style={{ objectFit: "contain" }}
                   alt="image"
-                  layout="responsive"
                   width={180}
                   height={120}
-                  className="transition-transform duration-300 ease-in-out hover:scale-110"
                 />
               </div>
-              <label className="text-center text-sm w-full mt-2 font-serif">
+              <label className="text-center text-sm w-full mt-2 ">
                 Iterate on the component to get the perfect design
               </label>
             </div>
@@ -439,18 +466,17 @@ const TailwindGen = () => {
               className="flex flex-col items-center rounded px-1 py-2"
               style={{ backgroundColor: "#f2f0e8" }}
             >
-              <div className="w-full">
+              <div className="w-full shrink-0 grow-1 flex justify-center">
                 <Image
-                  src="https://placehold.co/600x400/png"
+                  src="/three.jpeg"
                   alt="image"
-                  layout="responsive"
+                  style={{ objectFit: "contain" }}
                   width={180}
                   height={120}
-                  className="transition-transform duration-300 ease-in-out hover:scale-110"
                 />
               </div>
-              <label className="text-center text-sm w-full mt-2 font-serif">
-                Copy the component code in all popular JS frameworks
+              <label className="text-center text-sm w-full mt-2 ">
+                Copy the code in all popular JS frameworks
               </label>
             </div>
           </div>
@@ -458,19 +484,29 @@ const TailwindGen = () => {
       )}
 
       {context.length === 0 && (
-        <Divider className="text-sm font-serif">Some Examples for You</Divider>
+        <Divider
+          className={`text-sm pt-10 md:pt-0 ${
+            input === "" && context.length === 0 ? "" : "mt-10"
+          }`}
+        >
+          Some Examples for You
+        </Divider>
       )}
 
-      {context.length === 0 &&
-        exampleQuery.map((item) => (
-          <div
-            className="flex flex-col hover:bg-gray-200 items-center justify-center mt-8 p-5 mx-auto w-3/6 rounded-2xl border broder-solid border-black  "
-            // style={{ backgroundColor: "#f2f0e8" }}
-            onClick={() => handleExample(item)}
-          >
-            <h1 className="text-center font-serif"> {item} </h1>
-          </div>
-        ))}
+      <div className="pb-28 max-w-2xl mx-auto">
+        {context.length === 0 &&
+          exampleQuery.map((item, key) => (
+            <div
+              className="cursor-pointer flex flex-col hover:bg-gray-200 items-center justify-center mt-8 p-5 mx-auto  rounded-2xl border broder-solid border-black  "
+              // style={{ backgroundColor: "#f2f0e8" }}
+              key={key}
+              onClick={() => handleExample(item)}
+            >
+              <h1 className="text-center "> {item} </h1>
+            </div>
+          ))}
+      </div>
+      <DynamicJS href="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp" />
     </div>
   );
 };

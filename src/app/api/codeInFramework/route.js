@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
+import axios from "axios";
 
 export async function POST(NextRequest) {
   const openai = new OpenAI({
@@ -20,16 +21,30 @@ export async function POST(NextRequest) {
 
   let botResponse = "";
 
-  try {
-    const completion = await openai.chat.completions.create({
-      messages,
-      model: "gpt-3.5-turbo",
-    });
+  // try {
+  //   const completion = await openai.chat.completions.create({
+  //     messages,
+  //     model: "gpt-3.5-turbo",
+  //   });
 
-    botResponse = completion.choices[0].message.content;
+  //   botResponse = completion.choices[0].message.content;
+  // } catch (e) {
+  //   botResponse = "I am not able to generate the code. Please try again.";
+  //   console.log(e, "this is the error");
+  // }
+
+  try {
+    const data = {
+      model: "llama2",
+      prompt: messages[0].content,
+      stream: false,
+    };
+    const res = await axios.post(process.env.API_URL, data);
+
+    botResponse = res.data.response;
   } catch (e) {
-    botResponse = "I am not able to generate the code. Please try again.";
-    console.log(e, "this is the error");
+    botResponse = "I am not able to generate HTML code. Please try again.";
+    console.log(e);
   }
 
   if (botResponse.startsWith("```jsx")) {

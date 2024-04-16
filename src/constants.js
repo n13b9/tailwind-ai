@@ -25,16 +25,8 @@ export const secondaryColors = [
 ];
 
 export const exampleQuery = [
-  "Generate a sign up form with name, email, company name, phone number, role and a submit button",
-  "give three buttons",
-  "input field with search button",
+  "A signup form with email, name, phone umber and role",
+  "a toast component to use for alert",
+  "A landing page hero component with h1, p, CTA on left. An image placeholder on right. For placeholder image, use placeholoder.co",
+  "create a clean table with five columns - name, address, status, phone number, email id. Add dummy data",
 ];
-
-// export const frameworks = [
-//   { name: "React", handleCopy: () => handleCopyCode(item.message, "React") },
-//   {
-//     name: "Angular",
-//     handleCopy: () => handleCopyCode(item.message, "Angular"),
-//   },
-//   { name: "VueJs", handleCopy: () => handleCopyCode(item.message, "VueJs") },
-// ];
