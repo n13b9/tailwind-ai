@@ -16,7 +16,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={inter.className}>
         <div className="fixed top-0 left-0 right-0 z-50">
-          <Banner />
+          {/* <Banner /> */}
         </div>
         <Toaster position="top-center" />
         {children}
